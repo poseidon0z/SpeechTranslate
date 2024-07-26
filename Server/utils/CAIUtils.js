@@ -1,11 +1,14 @@
 import CAINode from 'cainode';
-import fs from 'fs';
+import fs, { readFileSync } from 'fs';
+
+const PATH = "./storage/CAIConfigFile.json";
 
 const Client = new CAINode();
 
-async function CAIConfig(token,char_id){
+export async function CAIConfig(token,char_id){
+    
     const data = {"token": token, "char_id": char_id};
-    fs.writeFileSync("../storage/CAIConfFile.json",data,()=>{
+    fs.writeFileSync(PATH,JSON.stringify(data),()=>{
             console.log("Config Saved!");
     });
 
@@ -22,5 +25,14 @@ async function CAIConfig(token,char_id){
     }
 }
 
+export async function GetResponse(message){
+    var data = fs.readFileSync(PATH,'utf-8');
+    data = JSON.parse(data);
+    
+    await Client.character.send_message(message,true,"");
+    
+    const rawResponse = Client.character.generate_turn();
 
-export default {CAIConfig};
+    return rawResponse;
+
+}
