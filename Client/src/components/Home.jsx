@@ -56,6 +56,7 @@ const Home = ({setContext,setMessage}) => {
   const handleYes = () => {
     setShowPopup(false);
     //Send The Audio to Transcribe and translate
+    navigate("/chat");
   }
 
   const handleTryAgain = () => {
