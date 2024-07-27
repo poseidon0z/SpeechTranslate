@@ -1,3 +1,11 @@
+@import "@fontsource/roboto";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.ibm-plex-serif-regular {
+  font-family: "IBM Plex Serif", serif;
+  font-weight: 700;
+  font-style: normal;
+}

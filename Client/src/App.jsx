@@ -1,10 +1,9 @@
-import ComponentNew from "./components/ComponentNew"
-
+import Home from "./components/Home"
 function App() {
 
   return (
     <>
-      <ComponentNew />
+      <Home></Home>
     </>
   )
 }
