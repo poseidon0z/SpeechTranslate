@@ -33,11 +33,11 @@ async function stt(audioBuffer, languageCode) {
   console.log(audioBuffer);
   const request = {
       audio: {
-          content: audioBuffer.toString('base64'),
+          content: audioBuffer,
       },
       config: {
           encoding: 'WEBM_OPUS',
-          sampleRateHertz: 16000,
+          sampleRateHertz: 48000,
           languageCode: languageCode,
       }
   };
