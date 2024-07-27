@@ -5,32 +5,8 @@ import ChatMessage from '../components/ChatMessage';
 import Inputs from '../components/Inputs';
 
 function Chat() {
-  const [messages, setMessages] = useState([
-    {
-      message:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In sagittis at augue non rutrum. ',
-      tamil: true,
-    },
-    {
-      message:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In sagittis at augue non rutrum. ',
-      tamil: false,
-    },
-    {
-      message: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      tamil: true,
-    },
-    {
-      message:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In sagittis at augue non rutrum. Donec sagittis nibh eu urna varius varius.',
-      tamil: true,
-    },
-    {
-      message:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In sagittis at augue non rutrum. Donec sagittis nibh eu urna varius varius.',
-      tamil: false,
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
+  console.log(messages)
 
   return (
     <>
@@ -58,10 +34,11 @@ function Chat() {
               key={index}
               message={item.message}
               tamil={item.tamil}
+              audio = {item.URL}
             ></ChatMessage>
           ))}
         </div>
-        <Inputs></Inputs>
+        <Inputs messages={messages} setMessages={setMessages}></Inputs>
       </div>
     </>
   );
