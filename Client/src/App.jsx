@@ -1,10 +1,10 @@
 import ComponentNew from "./components/ComponentNew"
-
+import AudioRecorder from "./components/AudioRecorder";
 function App() {
 
   return (
     <>
-      <ComponentNew />
+    <AudioRecorder/>
     </>
   )
 }
