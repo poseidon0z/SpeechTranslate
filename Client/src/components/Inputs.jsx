@@ -17,64 +17,112 @@ function Inputs() {
       const englishMediaRecorder = new MediaRecorder(stream, options);
 
       tamilMediaRecorder.ondataavailable = (event) => {
-        const audioBlob = event.data;
-        setTamilAudio(audioBlob);
-        setTamilAudioURL(URL.createObjectURL(audioBlob));
+        if (event.data.size > 0) {
+          const audioBlob = event.data;
+          setTamilAudio(audioBlob);
+          setTamilAudioURL(URL.createObjectURL(audioBlob));
+          console.log('Tamil audio blob set:', audioBlob);
+        }
       };
 
       englishMediaRecorder.ondataavailable = (event) => {
-        const audioBlob = event.data;
-        setEnglishAudio(audioBlob);
-        setEnglishAudioURL(URL.createObjectURL(audioBlob));
+        if (event.data.size > 0) {
+          const audioBlob = event.data;
+          setEnglishAudio(audioBlob);
+          setEnglishAudioURL(URL.createObjectURL(audioBlob));
+          console.log('English audio blob set:', audioBlob);
+        }
       };
 
       setTamilRecorder(tamilMediaRecorder);
       setEnglishRecorder(englishMediaRecorder);
+      console.log('Media recorders initialized:', { tamilMediaRecorder, englishMediaRecorder });
     };
 
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(handleStream);
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(handleStream).catch((error) => {
+      console.error('Error accessing media devices:', error);
+    });
   }, []);
 
   const startRecording = (language) => {
-    if (language === 'tamil' && tamilRecorder) {
+    if (language === 'tamil' && tamilRecorder && tamilRecorder.state === 'inactive') {
       tamilRecorder.start();
-    } else if (language === 'english' && englishRecorder) {
+      console.log('Started recording Tamil audio');
+    } else if (language === 'english' && englishRecorder && englishRecorder.state === 'inactive') {
       englishRecorder.start();
+      console.log('Started recording English audio');
+    } else {
+      console.log('Recorder not ready or already recording:', language);
     }
   };
 
   const stopRecording = (language) => {
-    if (language === 'tamil' && tamilRecorder) {
+    if (language === 'tamil' && tamilRecorder && tamilRecorder.state === 'recording') {
       tamilRecorder.stop();
-    } else if (language === 'english' && englishRecorder) {
+      console.log('Stopped recording Tamil audio');
+    } else if (language === 'english' && englishRecorder && englishRecorder.state === 'recording') {
       englishRecorder.stop();
+      console.log('Stopped recording English audio');
+    } else {
+      console.log('Recorder not ready or not recording:', language);
     }
   };
+
+  const uploadAudio = async (audioBlob, language) => {
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'audio.webm'); // Add filename to the blob
+    console.log("form",formData);
+
+    try {
+        console.log('Uploading audio:', { language });
+        const response = await fetch('http://localhost:5000/speechInput', {
+            method: 'POST',
+            body: formData, // Send FormData directly
+        });
+        const result = await response.json();
+        console.log('Server response:', result);
+    } catch (error) {
+        console.error('Error uploading audio:', error);
+    }
+};
+
+
+  useEffect(() => {
+    if (tamilAudio) {
+      console.log('Tamil audio state changed:', tamilAudio);
+      uploadAudio(tamilAudio, 'ta-IN');
+    }
+  }, [tamilAudio]);
+
+  useEffect(() => {
+    if (englishAudio) {
+      console.log('English audio state changed:', englishAudio);
+      uploadAudio(englishAudio, 'en-US');
+    }
+  }, [englishAudio]);
 
   return (
     <div>
       <div className="flex bottom-0 border-t-[1px] bg-white border-dashed border-black w-full py-2">
-        <div className="w-full flex justify-center">
-          <div className="flex flex-col gap-1 items-center relative">
-            <img
-              src={mic}
-              onMouseDown={() => startRecording('tamil')}
-              onMouseUp={() => stopRecording('tamil')}
-              alt="Tamil Mic"
-            />
-            <span>Tamil</span>
-          </div>
+        <div className="w-full flex flex-col items-center">
+          <img
+            src={mic}
+            alt="Tamil Mic"
+          />
+          <span>Tamil</span>
+          <button onClick={() => startRecording('tamil')}>Start Tamil</button>
+          <button onClick={() => stopRecording('tamil')}>Stop Tamil</button>
+          {tamilAudioURL && <audio controls src={tamilAudioURL}></audio>}
         </div>
-        <div className="w-full flex justify-center">
-          <div className="flex flex-col gap-1 items-center relative">
-            <img
-              src={mic}
-              onMouseDown={() => startRecording('english')}
-              onMouseUp={() => stopRecording('english')}
-              alt="English Mic"
-            />
-            <span>English</span>
-          </div>
+        <div className="w-full flex flex-col items-center">
+          <img
+            src={mic}
+            alt="English Mic"
+          />
+          <span>English</span>
+          <button onClick={() => startRecording('english')}>Start English</button>
+          <button onClick={() => stopRecording('english')}>Stop English</button>
+          {englishAudioURL && <audio controls src={englishAudioURL}></audio>}
         </div>
       </div>
     </div>
