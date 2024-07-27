@@ -1,5 +1,5 @@
 import { CAIConfig, GetResponse } from "./utils/CAIUtils.js"
-import { stt } from "./utils/GoogleAPIUtils.js";
+import { stt,translateText } from "./utils/GoogleAPIUtils.js";
 import cors from 'cors';
 
 import express from"express";
@@ -43,6 +43,18 @@ app.post("/speechInput", async (req, res) => {
     } catch (error) {
         console.error('Error processing speech input:', error);
         res.status(500).json({ error: 'Error processing speech input' });
+    }
+});
+
+app.post("/translate", async (req, res) =>{
+    const { content, source, target } = req.body;
+
+    try{
+        const translation = await translateText(content, source, target)
+        res.json({ result: translation });
+    }catch(error){
+        console.error('Error translating text:', error);
+        res.status(500).json({ error: 'Error translating text' });
     }
 });
 

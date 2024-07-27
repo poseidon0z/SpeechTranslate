@@ -69,6 +69,23 @@
         </div>
         <button type="submit">Send Speech Input</button>
     </form>
+
+    <h2>Translate Text</h2>
+    <form class="box" id="translateInputForm">
+        <div>
+            <label for="audio">Content:</label>
+            <input type="text" id="content" required><br>
+        </div>
+        <div>
+            <label for="language">Input Language Code:</label>
+            <input type="text" id="language-in" required><br>
+        </div>
+        <div>
+            <label for="language">Output Language Code:</label>
+            <input type="text" id="language-out" required><br>
+        </div>
+        <button type="submit">Translate</button>
+    </form>
     
     <div id="responseDiv"></div>
     
@@ -115,6 +132,39 @@
                 alert('Error sending speech input');
             }
         });
+
+        document.getElementById('translateInputForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const content = document.getElementById('content').value;
+    const source = document.getElementById('language-in').value;
+    const target = document.getElementById('language-out').value;
+
+    try {
+        const response = await fetch("http://localhost:5000/translate", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ content, source, target })
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        if (data.result) {
+            document.getElementById('responseDiv').innerHTML = `<h3>Translate Input Result:</h3><p>${data.result}</p>`;
+        } else {
+            document.getElementById('responseDiv').innerHTML = `<h3>Translate Input Result:</h3><p>No result</p>`;
+        }
+    } catch (error) {
+        console.error('Error sending translate input:', error);
+        alert('Error sending translate input');
+    }
+});
+
     </script>
 </body>
 </html>
