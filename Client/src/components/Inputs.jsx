@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import mic from '/mic.png';
 
-function Inputs() {
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result.split(',')[1]); // Extract Base64 string from Data URL
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+  });
+}
+
+
+function Inputs({ messages, setMessages }) {
   const [tamilAudio, setTamilAudio] = useState(null);
   const [englishAudio, setEnglishAudio] = useState(null);
   const [tamilAudioURL, setTamilAudioURL] = useState('');
@@ -68,36 +78,52 @@ function Inputs() {
     }
   };
 
-  const uploadAudio = async (audioBlob, language) => {
-    const formData = new FormData();
-    formData.append('audio', audioBlob, 'audio.webm'); // Add filename to the blob
-    console.log("form",formData);
-
+  const uploadAudio = async (audio, source, target) => {
     try {
-        console.log('Uploading audio:', { language });
-        const response = await fetch('http://localhost:5000/speechInput', {
+        // Convert the audio Blob to Base64
+        const base64Audio = await blobToBase64(audio);
+
+        // Prepare the data to send
+        const data = {
+            audio: base64Audio,
+            source,
+            target
+        };
+
+        console.log("Uploading audio with data:", data);
+
+        const response = await fetch('http://localhost:5000/getAll', {
             method: 'POST',
-            body: formData, // Send FormData directly
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
         });
+
+
         const result = await response.json();
-        console.log('Server response:', result);
+        setMessages([...messages,{message: result["Translation"], tamil: (result["Lang"] === 'ta-IN')?true:false, audio: result["URL"]}])
+    
     } catch (error) {
         console.error('Error uploading audio:', error);
     }
 };
 
 
+
   useEffect(() => {
     if (tamilAudio) {
       console.log('Tamil audio state changed:', tamilAudio);
-      uploadAudio(tamilAudio, 'ta-IN');
+      uploadAudio(tamilAudio, 'ta-IN', 'en-US');
+      
+      
     }
   }, [tamilAudio]);
 
   useEffect(() => {
     if (englishAudio) {
       console.log('English audio state changed:', englishAudio);
-      uploadAudio(englishAudio, 'en-US');
+      uploadAudio(englishAudio, 'en-US', 'ta-IN');
     }
   }, [englishAudio]);
 
@@ -112,7 +138,6 @@ function Inputs() {
           <span>Tamil</span>
           <button onClick={() => startRecording('tamil')}>Start Tamil</button>
           <button onClick={() => stopRecording('tamil')}>Stop Tamil</button>
-          {tamilAudioURL && <audio controls src={tamilAudioURL}></audio>}
         </div>
         <div className="w-full flex flex-col items-center">
           <img
@@ -122,7 +147,6 @@ function Inputs() {
           <span>English</span>
           <button onClick={() => startRecording('english')}>Start English</button>
           <button onClick={() => stopRecording('english')}>Stop English</button>
-          {englishAudioURL && <audio controls src={englishAudioURL}></audio>}
         </div>
       </div>
     </div>

@@ -72,9 +72,9 @@ app.post("/getAll", async (req, res) => {
     try {
         const transcription = await stt(audio, source);
         const translation = await translateText(transcription, source, target);
-        const output = await tts(translation, target);
+        const url = await tts(translation, target, Date.now()+'.webm');
 
-        res.status(200).json({ result: output });
+        res.status(200).json({ URL: url, Translation: translation, Lang: target });
     } catch (error) {
         console.error('Error processing speech:', error);
         res.status(500).json({ error: 'Error processing speech' });
