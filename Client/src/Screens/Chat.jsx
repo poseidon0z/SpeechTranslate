@@ -55,6 +55,7 @@ function Chat() {
         <div className="h-fill overflow-y-auto ">
           {messages.map((item, index) => (
             <ChatMessage
+              key={index}
               message={item.message}
               tamil={item.tamil}
             ></ChatMessage>
