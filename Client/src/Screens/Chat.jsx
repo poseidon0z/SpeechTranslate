@@ -6,7 +6,7 @@ import Inputs from '../components/Inputs';
 
 function Chat() {
   const [messages, setMessages] = useState([]);
-  console.log(messages)
+  console.log(messages);
 
   return (
     <>
@@ -28,13 +28,13 @@ function Chat() {
             English
           </div>
         </div>
-        <div className="h-fill overflow-y-auto ">
+        <div className="h-full overflow-y-auto ">
           {messages.map((item, index) => (
             <ChatMessage
               key={index}
               message={item.message}
               tamil={item.tamil}
-              audio = {item.URL}
+              audio={item.URL}
             ></ChatMessage>
           ))}
         </div>
