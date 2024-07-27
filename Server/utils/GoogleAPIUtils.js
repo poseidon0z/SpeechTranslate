@@ -1,12 +1,21 @@
 import { Storage } from '@google-cloud/storage';
 import { SpeechClient } from '@google-cloud/speech';
+import { Translate } from '@google-cloud/translate/build/src/v2/index.js';
+
+
+const KEY_PATH = "C:\\Users\\Rohit Sinha\\Desktop\\techEthos\\Server\\speesy-430611-088b524dad3e.json";
 
 const storage = new Storage({
-    keyFilename: "C:\\Users\\Rohit Sinha\\Desktop\\techEthos\\Server\\speesy-430611-088b524dad3e.json"
+    keyFilename: KEY_PATH
 });
 
 const speechCli = new SpeechClient({
-    keyFilename: "C:\\Users\\Rohit Sinha\\Desktop\\techEthos\\Server\\speesy-430611-088b524dad3e.json"
+    keyFilename: KEY_PATH
+});
+
+
+const translate = new Translate({
+  keyFilename: KEY_PATH
 });
 
 const bucketName = 'audio-bucket-speesy';
@@ -54,5 +63,20 @@ async function stt(audioPath, languageCode) {
     }
 }
 
-export { stt };
+async function translateText(content, source, target){
+  try{
+    const [translation] = await translate.translate(content,{
+      from: source,
+      to: target
+    });
+    console.log(`Translation: ${translation}`);
+    return translation;
+
+  }catch(error){
+    console.error('Error translating text:', error);
+    throw error;
+  }
+}
+
+export { stt, translateText };
 
