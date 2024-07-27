@@ -1,11 +1,21 @@
-import Home from "./components/Home"
-function App() {
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Home from "./components/Home";
+import Chat from './Screens/Chat';
 
+function App() {
   return (
     <>
-      <Home></Home>
+  
+
+    <BrowserRouter>
+      <Routes>
+        <Route path="chat" element={<Chat />} />
+
+        <Route path="/" element={<Home />}></Route>
+      </Routes>
+    </BrowserRouter>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
