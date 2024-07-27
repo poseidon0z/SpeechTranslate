@@ -1,5 +1,5 @@
 import { CAIConfig, GetResponse } from "./utils/CAIUtils.js"
-import { stt,translateText } from "./utils/GoogleAPIUtils.js";
+import { stt,tts, translateText } from "./utils/GoogleAPIUtils.js";
 import cors from 'cors';
 
 import express from"express";
@@ -55,6 +55,20 @@ app.post("/translate", async (req, res) =>{
     }catch(error){
         console.error('Error translating text:', error);
         res.status(500).json({ error: 'Error translating text' });
+    }
+});
+
+
+app.post("/speechOutput", async (req, res) => {
+    const {text, languageCode, audioFileName} = req.body;
+
+    try{
+        var audio = await tts(text,languageCode,audioFileName);
+        console.log(audio);
+        res.json({result: audio});  
+    }catch(error){
+        console.error('Error processing speech output:', error);
+        res.status(500).json({ error: 'Error processing speech output' });
     }
 });
 
