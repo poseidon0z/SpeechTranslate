@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: black;
+            color: white;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input, button {
+            margin: 5px;
+        }
+        button {
+            color: white;
+            background-color: black;
+            border: 2px solid white;
+            border-radius: 30px;
+            font-size: 20px;
+            margin: 10px;
+        }
+        button:hover {
+            color: black;
+            background-color: white;
+        }
+        input {
+            color: white;
+            background-color: black;
+            border: 2px solid white;
+            border-radius: 30px;
+        }
+        #responseDiv {
+            margin-top: 20px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>API Test Page</h1>
+    
+    <h2>Get Response from CAI</h2>
+    <form class="box" id="getResponseForm">
+        <div>
+            <label for="message">Message:</label>
+            <input type="text" id="message" required><br>
+        </div>
+        <button type="submit">Get Response</button>
+    </form>
+    
+    <h2>Send Speech Input</h2>
+    <form class="box" id="speechInputForm">
+        <div>
+            <label for="audio">Audio File Path:</label>
+            <input type="text" id="audio" required><br>
+        </div>
+        <div>
+            <label for="language">Language Code:</label>
+            <input type="text" id="language" required><br>
+        </div>
+        <button type="submit">Send Speech Input</button>
+    </form>
+    
+    <div id="responseDiv"></div>
+    
+    <script>
+        document.getElementById('getResponseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const message = document.getElementById('message').value;
+            
+            try {
+                const response = await fetch('http://localhost:5000/getResponse', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message })
+                });
+                const data = await response.json();
+                document.getElementById('responseDiv').innerHTML = `<h3>Response:</h3><p>${data.response}</p>`;
+            } catch (error) {
+                console.error('Error getting response:', error);
+                alert('Error getting response');
+            }
+        });
+
+        document.getElementById('speechInputForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const audio = document.getElementById('audio').value;
+            const language = document.getElementById('language').value;
+            
+            try {
+                const response = await fetch('http://localhost:5000/speechInput', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ audio, language })
+                });
+                const data = await response.json();
+                document.getElementById('responseDiv').innerHTML = `<h3>Speech Input Result:</h3><p>${data.result}</p>`;
+            } catch (error) {
+                console.error('Error sending speech input:', error);
+                alert('Error sending speech input');
+            }
+        });
+    </script>
+</body>
+</html>
