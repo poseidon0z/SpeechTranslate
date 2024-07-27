@@ -2,7 +2,71 @@ import React from 'react';
 import Homepage from "../assets/Homepage.png";
 import Voice from "../assets/voiceRecorder.png";
 import wavesImage from '../assets/waves.png';
-const Home = () => {
+import { useState,useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const Home = ({setContext,setMessage}) => {
+
+  const [inpText,setInpText] = useState("");
+  const [audio,setAudio] = useState(null);
+  const [audioURL,setAudioURL] = useState("");
+  const [audioRecorder,setAudioRecorder] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+
+  const audioFormat = 'audio/webm;codecs=opus'; // Explicitly set the format
+  const navigate = useNavigate();
+
+  const handleUserInp = (event)=>{
+    setInpText(event.target.value);
+  }
+
+  const handleSave = () => {
+    setContext(inpText);
+  }
+
+  useEffect(() => {
+    const handleStream = (stream) => {
+      const options = { mimeType: audioFormat };
+      const mediaRecorder = new MediaRecorder(stream, options);
+
+      mediaRecorder.ondataavailable = (event) => {
+        const audioBlob = event.data;
+        setAudio(audioBlob);
+        setAudioURL(URL.createObjectURL(audioBlob));
+      };
+      setAudioRecorder(mediaRecorder);
+    };
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(handleStream);
+  }, []);
+
+  const startRecording = () => {
+    if(audioRecorder){
+      audioRecorder.start();
+    }
+  };
+
+  const stopRecording = () => {
+    if(audioRecorder){
+      audioRecorder.stop();
+      setShowPopup(true);
+    }
+  };
+
+  const handleYes = () => {
+    setShowPopup(false);
+    //Send The Audio to Transcribe and translate
+  }
+
+  const handleTryAgain = () => {
+    setShowPopup(false);
+    setInpText("");
+    setAudio(null);
+    setAudioURL("");
+    setAudioRecorder(null);
+  }
+
+
   return (
     <div className='max-w-screen-sm'>
         <img src={wavesImage} alt="Waves" className='max-w-screen-sm w-screen'/>
@@ -17,13 +81,35 @@ const Home = () => {
 
         <div className='flex max-w-screen-sm w-screen justify-evenly mt-6'>
             <form className='w-9/12'>
-            <input type="text" placeholder="Eg: I want to buy 1kg potatoes" className="size-full px-2 py-4 border border-gray-500 "style={{ borderRadius: '1.5rem', borderColor: 'gray' }}/>
+            <input type="text" placeholder="Eg: I want to buy 1kg potatoes" className="size-full px-2 py-4 border border-gray-500 "style={{ borderRadius: '1.5rem', borderColor: 'gray' }}
+            onChange={handleUserInp}
+            value={inpText}
+            />
             </form>
+            <div><button className='border-2 border-[green] bg-[green] text-[white] font-bold mx-2 px-2 py-3 my-2 text-md rounded-custom' onClick={()=>handleSave()}
+            >Save</button></div>
             <div className='grid w-2/12 justify-items-center items-center p-4 border border-gray-500 mike' style={{ borderRadius: '50%', borderColor: '#932AFD' }}>
-  <img src={Voice} alt="Voice recorder" />
-</div>
-
+            <img
+              src={Voice}
+              onMouseDown={() => startRecording()}
+              onMouseUp={() => stopRecording()}
+              alt="Voice Recoarder"
+            />
+            </div>
         </div>
+        {showPopup && (
+        <div className='fixed inset-0 flex items-center justify-center bg-[black] bg-opacity-50'>
+          <div className='bg-[white] p-8 rounded shadow-lg text-center'>
+            <p className='mb-4'>You're looking for help doing : <strong>{inpText}</strong></p>
+            <button className='border-2 border-[green] bg-[green] text-[white] font-bold mx-2 px-4 py-2 my-2 text-md rounded' onClick={handleYes}>
+              Yes
+            </button>
+            <button className='border-2 border-[red] bg-[red] text-[white] font-bold mx-2 px-4 py-2 my-2 text-md rounded' onClick={handleTryAgain}>
+              Try Again
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
