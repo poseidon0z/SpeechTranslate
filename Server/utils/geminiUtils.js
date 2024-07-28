@@ -6,7 +6,17 @@ async function geminiUtils(context,message){
     try{
           const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
         
-        const prompt = `Context: ${context}\nMessage: ${message}\nParaphrase the above message in the given context and give me a single message.`;
+        const prompt = `You are an AI language model tasked with paraphrasing messages while considering their context. Given the following:
+Context: ${context}
+Original message: ${message}
+Please paraphrase the original message, taking into account the provided context. Your paraphrased version should:
+Maintain the core meaning and intent of the original message,
+Be adapted to fit the given context appropriately,
+Use different wording and sentence structure where possible,
+Retain any key terms or proper nouns that are essential to the message,
+Be approximately the same length as the original message,
+Sound natural and fluent.
+Provide your paraphrased version as a single, cohesive message.`;
         
           const result = await model.generateContent(prompt);
           const response = await result.response;
@@ -21,5 +31,6 @@ async function geminiUtils(context,message){
 
 let context = "Help me buy potatoes";
 let message = "Give me 2 kilos for 180";
+geminiUtils(context,message);
 
 export {geminiUtils}
