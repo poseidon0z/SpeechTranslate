@@ -67,12 +67,35 @@ app.post('/speechOutput', async (req, res) => {
   }
 });
 
+app.post('/getContext', async (req,res) => {
+    const { context, message } = req.body;
+    try{
+        const paraphrase = await geminiUtils(context,message);
+        console.log("paraphrase: ",paraphrase);
+        res.status(200).json({ result: paraphrase})
+    }catch(error){
+        console.error('Error getting context:', error);
+        res.status(500).json({ error: 'Error getting context' });
+    }
+})
+
 app.post('/getAll', async (req, res) => {
-  const { audio, source, target } = req.body;
+  const { audio, context, source, target } = req.body;
+
+  var translation = "";
+  var paraphrase = "";
 
   try {
     const transcription = await stt(audio, source);
-    const translation = await translateText(transcription, source, target);
+    if(source === 'en-US'){
+        paraphrase = await geminiUtils(context, transcription);
+        translation = await translateText(paraphrase, source, target);
+    }
+    if(source === 'ta-IN'){
+        translation = await translateText(transcription, source, target);
+        paraphrase = await geminiUtils(context, translation);
+        translation = paraphrase;
+    }
     const url = await tts(translation, target, Date.now() + '.webm');
 
     res.status(200).json({ URL: url, Translation: translation, Lang: target });
