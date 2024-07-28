@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Homepage from "../assets/Homepage.png";
 import Voice from "../assets/voiceRecorder.png";
 import wavesImage from '../assets/waves.png';
-import { useState,useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const Home = ({setContext,setMessage}) => {
 
@@ -70,7 +69,7 @@ const Home = ({setContext,setMessage}) => {
 
   return (
     <div className='max-w-screen-sm'>
-        <img src={wavesImage} alt="Waves" className='max-w-screen-sm w-screen'/>
+        <img src={wavesImage} alt="Waves" className='max-w-screen-sm w-screen '/>
         <p className="text-black-700 text-5xl text-center size-full ibm-plex-serif-regular">Speeasy</p>
         <img src={Homepage} alt="Home page image" className='mt-5'/>
         <div className= 'mt-6 w-60 text-black-400 text-sm font-roboto font-normal text-center m-auto'>"Transform your Tamil voice into English with ease! Speak, translate, and listen—bridging languages has never been simpler!"</div>
@@ -87,9 +86,9 @@ const Home = ({setContext,setMessage}) => {
             value={inpText}
             />
             </form>
-            <div><button className='border-2 border-[green] bg-[green] text-[white] font-bold mx-2 px-2 py-3 my-2 text-md rounded-custom' onClick={()=>handleSave()}
+            <div><button className='border-2 border-[green] bg-[green] text-[white] font-bold  px-2 py-3 my-2 text-md ' onClick={()=>handleSave()} style={{ borderRadius: '50%'}}
             >Save</button></div>
-            <div className='grid w-2/12 justify-items-center items-center p-4 border border-gray-500 mike' style={{ borderRadius: '50%', borderColor: '#932AFD' }}>
+            <div className='grid  justify-items-center items-center p-4 border border-gray-500 mike' style={{ borderRadius: '50%', borderColor: '#932AFD' }}>
             <img
               src={Voice}
               onMouseDown={() => startRecording()}
