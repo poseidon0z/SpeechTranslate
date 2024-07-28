@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import mic from '/mic.png';
 
-function Inputs() {
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(',')[1]); // Extract Base64 string from Data URL
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+function Inputs({ messages, setMessages }) {
   const [tamilAudio, setTamilAudio] = useState(null);
   const [englishAudio, setEnglishAudio] = useState(null);
   const [tamilAudioURL, setTamilAudioURL] = useState('');
@@ -17,64 +26,163 @@ function Inputs() {
       const englishMediaRecorder = new MediaRecorder(stream, options);
 
       tamilMediaRecorder.ondataavailable = (event) => {
-        const audioBlob = event.data;
-        setTamilAudio(audioBlob);
-        setTamilAudioURL(URL.createObjectURL(audioBlob));
+        if (event.data.size > 0) {
+          const audioBlob = event.data;
+          setTamilAudio(audioBlob);
+          setTamilAudioURL(URL.createObjectURL(audioBlob));
+          console.log('Tamil audio blob set:', audioBlob);
+        }
       };
 
       englishMediaRecorder.ondataavailable = (event) => {
-        const audioBlob = event.data;
-        setEnglishAudio(audioBlob);
-        setEnglishAudioURL(URL.createObjectURL(audioBlob));
+        if (event.data.size > 0) {
+          const audioBlob = event.data;
+          setEnglishAudio(audioBlob);
+          setEnglishAudioURL(URL.createObjectURL(audioBlob));
+          console.log('English audio blob set:', audioBlob);
+        }
       };
 
       setTamilRecorder(tamilMediaRecorder);
       setEnglishRecorder(englishMediaRecorder);
+      console.log('Media recorders initialized:', {
+        tamilMediaRecorder,
+        englishMediaRecorder,
+      });
     };
 
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(handleStream);
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then(handleStream)
+      .catch((error) => {
+        console.error('Error accessing media devices:', error);
+      });
   }, []);
 
   const startRecording = (language) => {
-    if (language === 'tamil' && tamilRecorder) {
+    if (
+      language === 'tamil' &&
+      tamilRecorder &&
+      tamilRecorder.state === 'inactive'
+    ) {
       tamilRecorder.start();
-    } else if (language === 'english' && englishRecorder) {
+      console.log('Started recording Tamil audio');
+    } else if (
+      language === 'english' &&
+      englishRecorder &&
+      englishRecorder.state === 'inactive'
+    ) {
       englishRecorder.start();
+      console.log('Started recording English audio');
+    } else {
+      console.log('Recorder not ready or already recording:', language);
     }
   };
 
   const stopRecording = (language) => {
-    if (language === 'tamil' && tamilRecorder) {
+    if (
+      language === 'tamil' &&
+      tamilRecorder &&
+      tamilRecorder.state === 'recording'
+    ) {
       tamilRecorder.stop();
-    } else if (language === 'english' && englishRecorder) {
+      console.log('Stopped recording Tamil audio');
+    } else if (
+      language === 'english' &&
+      englishRecorder &&
+      englishRecorder.state === 'recording'
+    ) {
       englishRecorder.stop();
+      console.log('Stopped recording English audio');
+    } else {
+      console.log('Recorder not ready or not recording:', language);
     }
   };
+
+  const uploadAudio = async (audio, source, target) => {
+    try {
+      // Convert the audio Blob to Base64
+      const base64Audio = await blobToBase64(audio);
+
+      // Prepare the data to send
+      const data = {
+        audio: base64Audio,
+        source,
+        target,
+      };
+
+      console.log('Uploading audio with data:', data);
+
+      const response = await fetch('http://localhost:5000/getAll', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      setMessages([
+        ...messages,
+        {
+          message: result['Translation'],
+          tamil: result['Lang'] === 'ta-IN' ? true : false,
+          audio: result['URL'],
+        },
+      ]);
+    } catch (error) {
+      console.error('Error uploading audio:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (tamilAudio) {
+      console.log('Tamil audio state changed:', tamilAudio);
+      uploadAudio(tamilAudio, 'ta-IN', 'en-US');
+    }
+  }, [tamilAudio]);
+
+  useEffect(() => {
+    if (englishAudio) {
+      console.log('English audio state changed:', englishAudio);
+      uploadAudio(englishAudio, 'en-US', 'ta-IN');
+    }
+  }, [englishAudio]);
 
   return (
     <div>
       <div className="flex bottom-0 border-t-[1px] bg-white border-dashed border-black w-full py-2">
-        <div className="w-full flex justify-center">
-          <div className="flex flex-col gap-1 items-center relative">
-            <img
-              src={mic}
-              onMouseDown={() => startRecording('tamil')}
-              onMouseUp={() => stopRecording('tamil')}
-              alt="Tamil Mic"
-            />
-            <span>Tamil</span>
-          </div>
+        <div className="w-full flex flex-col items-center">
+          <img
+            src={mic}
+            alt="Tamil Mic"
+            onMouseDown={() => {
+              startRecording('tamil');
+            }}
+            onMouseUp={() => {
+              stopRecording('tamil');
+            }}
+          />
+          <span>Tamil</span>
+          <button onClick={() => startRecording('tamil')}>Start Tamil</button>
+          <button onClick={() => stopRecording('tamil')}>Stop Tamil</button>
         </div>
-        <div className="w-full flex justify-center">
-          <div className="flex flex-col gap-1 items-center relative">
-            <img
-              src={mic}
-              onMouseDown={() => startRecording('english')}
-              onMouseUp={() => stopRecording('english')}
-              alt="English Mic"
-            />
-            <span>English</span>
-          </div>
+        <div className="w-full flex flex-col items-center">
+          <img
+            src={mic}
+            alt="English Mic"
+            onMouseDown={() => {
+              startRecording('english');
+            }}
+            onMouseUp={() => {
+              stopRecording('english');
+            }}
+          />
+          <span>English</span>
+          <button onClick={() => startRecording('english')}>
+            Start English
+          </button>
+          <button onClick={() => stopRecording('english')}>Stop English</button>
         </div>
       </div>
     </div>
