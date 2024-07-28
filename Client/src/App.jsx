@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Home from './components/Home';
 import Chat from './Screens/Chat';
 import { useState } from 'react';
+import CAI from './Screens/CAI';
 
 function App() {
   const [context, setContext] = useState('');
@@ -16,6 +17,7 @@ function App() {
             path="/"
             element={<Home setContext={setContext} setMessage={setMessage} />}
           ></Route>
+          <Route path="CAI" element={<CAI></CAI>} />
         </Routes>
       </BrowserRouter>
     </>
