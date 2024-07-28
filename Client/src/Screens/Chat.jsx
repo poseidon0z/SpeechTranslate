@@ -34,7 +34,7 @@ function Chat({ context }) {
               key={index}
               message={item.message}
               tamil={item.tamil}
-              audio={item.URL}
+              audio={item.audio}
             ></ChatMessage>
           ))}
         </div>

@@ -107,9 +107,9 @@ function Inputs({ messages, setMessages, context }) {
       // Prepare the data to send
       const data = {
         audio: base64Audio,
+        context,
         source,
         target,
-        context,
       };
 
       console.log('Uploading audio with data:', data);
@@ -139,14 +139,14 @@ function Inputs({ messages, setMessages, context }) {
   useEffect(() => {
     if (tamilAudio) {
       console.log('Tamil audio state changed:', tamilAudio);
-      uploadAudio(tamilAudio, 'ta-IN', 'en-US');
+      uploadAudio(tamilAudio, context, 'ta-IN', 'en-US');
     }
   }, [tamilAudio]);
 
   useEffect(() => {
     if (englishAudio) {
       console.log('English audio state changed:', englishAudio);
-      uploadAudio(englishAudio, 'en-US', 'ta-IN');
+      uploadAudio(englishAudio, context, 'en-US', 'ta-IN');
     }
   }, [englishAudio]);
 
@@ -165,8 +165,8 @@ function Inputs({ messages, setMessages, context }) {
             }}
           />
           <span>Tamil</span>
-          <button onClick={() => startRecording('tamil')}>Start Tamil</button>
-          <button onClick={() => stopRecording('tamil')}>Stop Tamil</button>
+          {/* <button onClick={() => startRecording('tamil')}>Start Tamil</button>
+          <button onClick={() => stopRecording('tamil')}>Stop Tamil</button> */}
         </div>
         <div className="w-full flex flex-col items-center">
           <img
@@ -180,10 +180,10 @@ function Inputs({ messages, setMessages, context }) {
             }}
           />
           <span>English</span>
-          <button onClick={() => startRecording('english')}>
+          {/* <button onClick={() => startRecording('english')}>
             Start English
           </button>
-          <button onClick={() => stopRecording('english')}>Stop English</button>
+          <button onClick={() => stopRecording('english')}>Stop English</button> */}
         </div>
       </div>
     </div>
