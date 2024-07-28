@@ -10,7 +10,7 @@ function blobToBase64(blob) {
   });
 }
 
-function Inputs({ messages, setMessages }) {
+function Inputs({ messages, setMessages, context }) {
   const [tamilAudio, setTamilAudio] = useState(null);
   const [englishAudio, setEnglishAudio] = useState(null);
   const [tamilAudioURL, setTamilAudioURL] = useState('');
@@ -99,7 +99,7 @@ function Inputs({ messages, setMessages }) {
     }
   };
 
-  const uploadAudio = async (audio, source, target) => {
+  const uploadAudio = async (audio, context, source, target) => {
     try {
       // Convert the audio Blob to Base64
       const base64Audio = await blobToBase64(audio);
@@ -109,6 +109,7 @@ function Inputs({ messages, setMessages }) {
         audio: base64Audio,
         source,
         target,
+        context,
       };
 
       console.log('Uploading audio with data:', data);

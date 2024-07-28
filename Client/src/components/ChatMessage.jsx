@@ -4,6 +4,7 @@ import speaker from '/speakerIcon.png';
 function ChatMessage({ message, tamil, audio }) {
   // Use useRef to persist the audio element
   const audioRef = useRef(null);
+  const pleasework = audio;
 
   // Function to handle audio play
   const handleAudioPlay = () => {
@@ -35,12 +36,14 @@ function ChatMessage({ message, tamil, audio }) {
         </>
       ) : (
         <div className="ml-auto flex gap-4 items-center">
-          <img
-            src={speaker}
-            className="w-9 h-9 m-2 cursor-pointer"
-            onClick={handleAudioPlay}
-            alt="Play audio"
-          />
+          {audio && (
+            <img
+              src={speaker}
+              className="w-9 h-9 m-2 cursor-pointer"
+              onClick={handleAudioPlay}
+              alt="Play audio"
+            />
+          )}
           <div className="flex justify-end m-2 mx-1">
             <div className="relative p-2 rounded-md bg-[#FFDFD6] text-black rounded-tr-none">
               {message}
@@ -48,9 +51,6 @@ function ChatMessage({ message, tamil, audio }) {
           </div>
         </div>
       )}
-
-      {/* Include the audio element, but keep it hidden */}
-      <audio ref={audioRef} src={audio} />
     </div>
   );
 }
