@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ChatBot from "../assets/ChatBot.png";
 import Homepage from '../assets/Homepage.png';
 import Voice from '../assets/voiceRecorder.png';
 import wavesImage from '../assets/waves.png';
@@ -128,8 +129,12 @@ const Home = ({ setContext, setMessage }) => {
           </p>
         </div>
       </div>
-
-      <div className="flex max-w-screen-sm w-screen justify-evenly mt-6">
+      <div className="h-11 w-11">
+    <div className='p-2 bg-slate-400 inline-block rounded-full absolute right-0 "max-w-screen-sm'> 
+      <img src={ChatBot} alt="Chatbot" className="h-10 w-10" onClick={() => navigate('/Cai')}></img>
+    </div>
+    </div>
+      <div className="flex max-w-screen-sm w-screen justify-evenly mt-6 ">
         <form className="w-9/12">
           <input
             type="text"
