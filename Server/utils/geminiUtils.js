@@ -31,6 +31,5 @@ Provide your paraphrased version as a single, cohesive message.`;
 
 let context = "Help me buy potatoes";
 let message = "Give me 2 kilos for 180";
-geminiUtils(context,message);
 
 export {geminiUtils}
