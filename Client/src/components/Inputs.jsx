@@ -99,7 +99,7 @@ function Inputs({ messages, setMessages, context }) {
     }
   };
 
-  const uploadAudio = async (audio, source, target) => {
+  const uploadAudio = async (audio, context, source, target) => {
     try {
       // Convert the audio Blob to Base64
       const base64Audio = await blobToBase64(audio);
