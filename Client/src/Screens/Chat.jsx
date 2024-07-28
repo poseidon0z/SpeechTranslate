@@ -4,7 +4,7 @@ import arrows from '/arrows.png';
 import ChatMessage from '../components/ChatMessage';
 import Inputs from '../components/Inputs';
 
-function Chat() {
+function Chat({ context }) {
   const [messages, setMessages] = useState([]);
   console.log(messages);
 
@@ -38,7 +38,11 @@ function Chat() {
             ></ChatMessage>
           ))}
         </div>
-        <Inputs messages={messages} setMessages={setMessages}></Inputs>
+        <Inputs
+          messages={messages}
+          setMessages={setMessages}
+          context={context}
+        ></Inputs>
       </div>
     </>
   );

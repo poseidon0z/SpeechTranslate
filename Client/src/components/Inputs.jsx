@@ -10,7 +10,7 @@ function blobToBase64(blob) {
   });
 }
 
-function Inputs({ messages, setMessages }) {
+function Inputs({ messages, setMessages, context }) {
   const [tamilAudio, setTamilAudio] = useState(null);
   const [englishAudio, setEnglishAudio] = useState(null);
   const [tamilAudioURL, setTamilAudioURL] = useState('');
@@ -109,6 +109,7 @@ function Inputs({ messages, setMessages }) {
         audio: base64Audio,
         source,
         target,
+        context,
       };
 
       console.log('Uploading audio with data:', data);
